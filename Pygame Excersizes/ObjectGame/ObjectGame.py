@@ -20,6 +20,7 @@ delay = 20 # How many pixels off screen the robot will be when it wraps around t
 timer = 0
 numRobots = 5
 _playerspeed=3
+_radius=15
 screendim = pygame.display.get_surface().get_size()
 #endregion
 
@@ -35,7 +36,7 @@ class vector:
 
 class robot:
     def __init__(self, colorset, xset, yset, dirx=0, diry=0):
-        self.radius = 15
+        self.radius = _radius
         self.set(colorset,xset,yset)
         self.direction = vector(dirx, diry)
 
@@ -146,7 +147,10 @@ while True:
     for i in range(len(robots)):
         # print(i)
         # if hero bot is in contact with robots[i], hero loses 1 life and robots[i] moves opposite direction
-        # if distance between robots (i.e., hypotenuse h) is less than twice radius, then they are colliding 
+        # if distance between robots (i.e., hypotenuse h) is less than twice radius, then they are colliding
+        #  h = vector(robots[i].x - playerbot.x,robots[i].y - playerbot.y)
+        # check if h.magnitude() <= 2*_radius then we are in collision
+        #   set the direction of enemy based on h.x, h.y (or, is it -h.y?)
         if timer % 120 == 0: # every 2 seconds, randomly change direction of robot
             robots[i].setdirection(random.randint(-1,1)+robots[i].direction.x,random.randint(-_playerspeed,-1)+robots[i].direction.y)
         elif(robots[i].x > screendim[0]): # if robot near right edge of screen, move it left
