@@ -19,6 +19,7 @@ down_pressed = False
 delay = 20 # How many pixels off screen the robot will be when it wraps around to the bottom from top
 timer = 0
 numRobots = 5
+_playerspeed=3
 screendim = pygame.display.get_surface().get_size()
 #endregion
 
@@ -132,20 +133,20 @@ while True:
 
     #region Player Direction
     if up_pressed:
-        playerbot.move(0,-3)
+        playerbot.move(0,-_playerspeed)
     if down_pressed:
-        playerbot.move(0,3)
+        playerbot.move(0,_playerspeed)
     if left_pressed:
-        playerbot.move(-3,0)
+        playerbot.move(-_playerspeed,0)
     if right_pressed:
-        playerbot.move(3,0)
+        playerbot.move(_playerspeed,0)
     #endregion
 
     #region Robots Direction
     for i in range(len(robots)):
         # print(i)
         if timer % 120 == 0:
-            robots[i].setdirection(random.randint(-1,1),-1)
+            robots[i].setdirection(random.randint(-1,1),random.randint(-_playerspeed,-1))
         elif(robots[i].x > screendim[0]):
             robots[i].setdirection(-1)
         elif(robots[i].x < 0):
