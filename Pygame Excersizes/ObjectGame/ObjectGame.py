@@ -145,14 +145,16 @@ while True:
     #region Robots Direction
     for i in range(len(robots)):
         # print(i)
-        if timer % 120 == 0:
+        # if hero bot is in contact with robots[i], hero loses 1 life and robots[i] moves opposite direction
+        # hero bot x + radius 
+        if timer % 120 == 0: # every 2 seconds, randomly change direction of robot
             robots[i].setdirection(random.randint(-1,1),random.randint(-_playerspeed,-1))
-        elif(robots[i].x > screendim[0]):
+        elif(robots[i].x > screendim[0]): # if robot near right edge of screen, move it left
             robots[i].setdirection(-1)
-        elif(robots[i].x < 0):
+        elif(robots[i].x < 0): # if robot near left edge of screen, move it right
             robots[i].setdirection(1)
-        if(robots[i].y <= 0):
-            robots[i].y = screendim[1] + delay
+        if(robots[i].y <= 0): # if the robot is at top of screen, wrap it around to bottom
+            robots[i].y = screendim[1] + delay # 'delay' is the space below the screen where the robot starts
         robots[i].move()
         robots[i].draw()
     #endregion
