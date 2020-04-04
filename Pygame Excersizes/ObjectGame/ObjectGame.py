@@ -146,9 +146,9 @@ while True:
     for i in range(len(robots)):
         # print(i)
         # if hero bot is in contact with robots[i], hero loses 1 life and robots[i] moves opposite direction
-        # hero bot x + radius 
+        # if distance between robots (i.e., hypotenuse h) is less than twice radius, then they are colliding 
         if timer % 120 == 0: # every 2 seconds, randomly change direction of robot
-            robots[i].setdirection(random.randint(-1,1),random.randint(-_playerspeed,-1))
+            robots[i].setdirection(random.randint(-1,1)+robots[i].direction.x,random.randint(-_playerspeed,-1)+robots[i].direction.y)
         elif(robots[i].x > screendim[0]): # if robot near right edge of screen, move it left
             robots[i].setdirection(-1)
         elif(robots[i].x < 0): # if robot near left edge of screen, move it right
