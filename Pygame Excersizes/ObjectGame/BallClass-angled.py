@@ -6,13 +6,15 @@
 #note: some random crashes may occur - not sure how to fix them
 
 #region Imports
-import pygame, sys, random, math
+import pygame, sys, random, math, os
 from pygame.locals import *
 from pygame.math import Vector2
+from forbiddenfruit import curse
 pygame.init()
 #endregion
 
 #region Defining Variables
+precision = 12
 windowSurfaceObj = pygame.display.set_mode((1280, 720))
 pygame.display.set_caption('Object Game')
 clrBlack = pygame.Color(0, 0, 0)
@@ -31,6 +33,10 @@ screendim = pygame.display.get_surface().get_size()
 #endregion
 
 #region Classes
+
+def _magnitude_angle_form(self):
+    return "(%d @ %d°)"%(round(self.magnitude(),precision),round(self.angle_to(),precision))
+curse(Vector2, "__str__", _magnitude_angle_form)
 
 class robot:
     def __init__(self, speed, colorset, xset, yset, dirx=0, diry=0):
@@ -164,20 +170,23 @@ while True:
         elif(robots[i].direction.y > maxspeed or robots[i].direction.y < -maxspeed):
             robots[i].setdirection(None, robots[i].direction.y/1.5)
         #region collision
-        impact = Vector2((playerbot.x- robots[i].x),(playerbot.y-robots[i].y)) # the vector pointing from bad ball to player 
+        impact = Vector2((playerbot.x- robots[i].x),(playerbot.y-robots[i].y)) # the vector pointing from bad robot to player 
         if impact.magnitude() <= (playerbot.radius + robots[i].radius): # then, we have impact
             # new direction vector for player = ndir_player 
             # ndir_player = dir_player + magnitude(dir_enemy)*cosɵ*impact_unit
-            impact_unit = impact / impact.magnitude()
-            cosTheta = robots[i].direction.dot(impact_unit) / robots[i].direction.magnitude() + 0.000000000000002
-            plrdir = playerbot.direction
-            robdir = robots[i].direction
+            impact_unit = impact / impact.magnitude() #this is the unit vector pointing in direction of impact
+            cosTheta = round(robots[i].direction.dot(impact_unit) / robots[i].direction.magnitude(),precision) #cosine(angle_btwn_vectors) where 'angle_btwn_vectors' is the angle between the 'player direction vector' and the 'impact vector'
+            plrdir = playerbot.direction #player vector
+            robdir = robots[i].direction #robot vector, which stands in for robot velocity
             playerbot.direction = robdir.magnitude()*math.acos(cosTheta)*impact_unit
             robots[i].direction = plrdir.magnitude()*math.acos(cosTheta)*(-impact_unit)
             up_pressed = False
             left_pressed = False
             right_pressed = False
             down_pressed = False
+            print(playerbot.direction)
+            print(robots[i].direction)
+            os.system("pause")
         #endregion
         robots[i].move()
         robots[i].draw()
