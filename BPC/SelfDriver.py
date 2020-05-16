@@ -16,7 +16,7 @@ pygame.display.set_caption('Self Driving Car')
 LeftTurn = (0, 0, 0)
 RightTurn = (255, 255, 255)
 
-track = pygame.image.load('TrackBG.jpg')
+track = pygame.image.load('CollisionMap.jpg')
 CollisionMap = Image.open('CollisionMap.jpg')
 
 class car:
