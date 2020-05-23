@@ -36,8 +36,8 @@ CollisionMap = Image.open('CollisionMap1.jpg')
 Count = 0
 RunMe = True
 
-print CollisionMap.getpixel((200, 300))
-print CollisionMap.getpixel((600, 300))
+print(CollisionMap.getpixel((200, 300)))
+print(CollisionMap.getpixel((600, 300)))
 
 class car:
 	def __init__(self):

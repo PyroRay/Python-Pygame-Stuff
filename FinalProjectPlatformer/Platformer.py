@@ -2,6 +2,8 @@
 #Platforming game
 #Mr Blake
 
+#possible sprites: opengameart.org
+
 import pygame, sys, random, math
 from pygame.locals import *
 
@@ -19,30 +21,25 @@ screendim = pygame.display.get_surface().get_size()
 runGame = True
 
 class player:
-    def __init__(self, speed, color, height, width, xset, yset, dirx, diry):
-        self.image = pygame.image.load('squirrel.png')
+    def __init__(self, speed, color, height, width, xset, yset):
+        # self.image = pygame.image.load('squirrel.png')
         self.radius = 15 #basically the size
         self.direction = ""
         self.speed = speed
         self.color = color
-        self.size = (height, width)
+        self.size = (width, height)
         self.x = xset
         self.y = yset
 
     def draw(self):
-        pygame.draw.rect(windowSurfaceObj, (self.color), (self.size))
+        pygame.draw.rect(windowSurfaceObj, (self.color), (self.x - self.size[0]//2, self.y - self.size[1]//2, self.size[0], self.size[1]))
+        pygame.draw.circle(windowSurfaceObj, clrRed, (self.x, self.y), 5)
     
-    def move(self, dirx, diry):
-        if(dirx == None):
-            self.x += self.direction.x
-        else:
-            self.x += dirx
-        if(diry == None):
-            self.y += self.direction.y
-        else:
-            self.y += diry
+    def move(self, dirx = 0, diry = 0):
+        self.x += dirx
+        self.y += diry
 
-player1 = player(10, clrWhite, 10, 5, screendim[0]//2, screendim[1]//2)
+player1 = player(10, clrWhite, 100, 50, screendim[0]//2, screendim[1]//2)
 
 while runGame:
     windowSurfaceObj.fill(clrBlack)	
@@ -78,6 +75,22 @@ while runGame:
             elif event.key == pygame.K_d:
                 # print("\'d\' key was let go")
                 right_pressed = False
+
+    if left_pressed:
+        player1.move(-player1.speed)
+    elif right_pressed:
+        player1.move(player1.speed)
+
+    if player1.y + player1.size[1] >= screendim[1]-20: # player is on the ground
+        # print("ground")
+        # player1.move() # player is not moving  
+        if up_pressed:
+            player1.move(0)
+    else:
+        player1.move(0, 5)
+
+    player1.move()
+    player1.draw()
 
     pygame.display.update()
     fpsClock.tick(60)

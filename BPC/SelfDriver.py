@@ -1,7 +1,3 @@
-#Harper Kim
-#Pixel Collision Assignment
-#Python 2.7.17
-
 import pygame, sys, math
 from pygame.locals import *
 from pygame import gfxdraw
