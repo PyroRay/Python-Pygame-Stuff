@@ -19,6 +19,8 @@ up_pressed = False
 down_pressed = False
 screendim = pygame.display.get_surface().get_size()
 runGame = True
+jumptime = 0
+fallspeed = 5
 
 class player:
     def __init__(self, speed, color, height, width, xset, yset, falling = False):
@@ -31,6 +33,7 @@ class player:
         self.x = xset
         self.y = yset
         self.falling = falling
+        self.jumptime = 20
 
     def draw(self):
         pygame.draw.rect(windowSurfaceObj, (self.color), (self.x - self.size[0]//2, self.y - self.size[1]//2, self.size[0], self.size[1]))
@@ -40,7 +43,31 @@ class player:
         self.x += dirx
         self.y += diry
 
+class platform:
+    def __init__(self, color, height, width, xset, yset):
+        self.size = (width, height)
+        self.color = color
+        self.x = xset
+        self.y = yset
+
+    def draw(self):
+        pygame.draw.rect(windowSurfaceObj, (self.color), (self.x - self.size[0]//2, self.y - self.size[1]//2, self.size[0], self.size[1]))
+        pygame.draw.circle(windowSurfaceObj, clrBlack, (self.x, self.y), 5)
+
+
+
+def onGround(plr):
+    # print(plr.y)
+    if plr.y + plr.size[1] >= screendim[1]-20:
+        return True
+    else:
+        return False
+
+def jump(plr, jumptime):
+    plr.move(0, -jumptime)
+
 player1 = player(10, clrWhite, 100, 50, screendim[0]//2, screendim[1]//2)
+platform1 = platform(clrRed, 50, screendim[0], screendim[0]//2, screendim[1] - 45)
 
 while runGame:
     windowSurfaceObj.fill(clrBlack)	
@@ -82,20 +109,40 @@ while runGame:
     elif right_pressed:
         player1.move(player1.speed)
 
-    if player1.y + player1.size[1] >= screendim[1]-20: # player is on the ground
+    if onGround(player1) and not(up_pressed): # player is on the ground
         # print("ground")
         # player1.move() # player is not moving
+        fallspeed = 5
         player1.falling = False
-        if up_pressed:
-            player1.move(0, -10)
+        jumptime = player1.jumptime
+    elif up_pressed:
+        # if onGround(player1):
+        #     player1.falling = False
+            # print("jump")
+        if jumptime > -5 and player1.y + jumptime < screendim[1]-20:
+            # print("jumping")
+            jump(player1, jumptime)
+            jumptime -= 1
+        elif onGround(player1):
+            player1.falling = False
+            # print("stop")
         else:
             player1.falling = True
+        # print(jumptime)
+    elif not(onGround(player1)) and not(up_pressed):
+        player1.falling = True
+        jumptime = -5
 
     if player1.falling:
-        player1.move(0, 5)
+        player1.move(0, fallspeed)
+        fallspeed += 1
+
+    platform1.draw()
 
     player1.move()
     player1.draw()
+
+    # print("tick")
 
     pygame.display.update()
     fpsClock.tick(60)
