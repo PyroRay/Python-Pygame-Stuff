@@ -111,16 +111,11 @@ while runGame:
         player1.move(player1.speed)
 
     if onGround(player1) and not(up_pressed): # player is on the ground
-        # print("ground")
-        # player1.move() # player is not moving
-        fallspeed = 5
-        player1.falling = False
-        jumptime = player1.jumptime
-    elif up_pressed:
-        # if onGround(player1):
-        #     player1.falling = False
-            # print("jump")
-        if jumptime > -5 and player1.y + jumptime < screendim[1]-20:
+        fallspeed = 5 # resets the velocity of fall
+        player1.falling = False # player stops falling
+        jumptime = player1.jumptime # resets the player's jump
+    elif up_pressed: # if player presses 'w'
+        if jumptime > -5 and player1.y + jumptime < screendim[1]-20: # if player has enough 'jump'
             # print("jumping")
             jump(player1, jumptime)
             jumptime -= 1
@@ -130,13 +125,13 @@ while runGame:
         else:
             player1.falling = True
         # print(jumptime)
-    elif not(onGround(player1)) and not(up_pressed):
-        player1.falling = True
-        jumptime = -5
+    elif not(onGround(player1)) and not(up_pressed): # if player is in air and lets go of 'w'
+        player1.falling = True # player starts falling
+        jumptime = -5 # prevents player from 'jumping' in the air
 
     if player1.falling:
-        if fallspeed > (screendim[1]-20) - (player1.y + player1.size[1]/2): #checks if the player's falling vector is larger than the distance to the ground
-            fallspeed = int((screendim[1] - 20) - (player1.y + player1.size[1]/2))
+        if fallspeed > (screendim[1]-20) - (player1.y + player1.size[1]/2): # if the player's falling vector is larger than the distance to the ground
+            fallspeed = int((screendim[1] - 20) - (player1.y + player1.size[1]/2)) # changes the vector to the distance between the player and the ground, therefore falling directly onto the surface
         player1.move(0, fallspeed)
         fallspeed += 1
 
@@ -145,9 +140,7 @@ while runGame:
     player1.move()
     player1.draw()
 
-    # pygame.draw.circle(windowSurfaceObj, clrGreen, (player1.x, (player1.y + player1.size[1]//2)), 5) #draws circle at bottom of player
-
-    # print("tick")
+    pygame.draw.circle(windowSurfaceObj, clrGreen, (player1.x, (player1.y + player1.size[1]//2)), 5) #draws circle at bottom of player
 
     pygame.display.update()
     fpsClock.tick(60)
