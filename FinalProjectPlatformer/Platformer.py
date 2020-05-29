@@ -12,6 +12,7 @@ pygame.display.set_caption('Platformer')
 fpsClock = pygame.time.Clock()
 clrBlack = pygame.Color(0, 0, 0)
 clrRed = pygame.Color(255, 0, 0)
+clrGreen = pygame.Color(0, 255, 0)
 clrWhite = pygame.Color(255, 255, 255)
 left_pressed = False
 right_pressed = False
@@ -58,7 +59,7 @@ class platform:
 
 def onGround(plr):
     # print(plr.y)
-    if plr.y + plr.size[1] >= screendim[1]-20:
+    if plr.y + plr.size[1]/2 >= screendim[1]-20:
         return True
     else:
         return False
@@ -67,7 +68,7 @@ def jump(plr, jumptime):
     plr.move(0, -jumptime)
 
 player1 = player(10, clrWhite, 100, 50, screendim[0]//2, screendim[1]//2)
-platform1 = platform(clrRed, 50, screendim[0], screendim[0]//2, screendim[1] - 45)
+platform1 = platform(clrRed, 40, screendim[0], screendim[0]//2, screendim[1])
 
 while runGame:
     windowSurfaceObj.fill(clrBlack)	
@@ -134,13 +135,17 @@ while runGame:
         jumptime = -5
 
     if player1.falling:
+        if fallspeed > (screendim[1]-20) - (player1.y + player1.size[1]/2): #checks if the player's falling vector is larger than the distance to the ground
+            fallspeed = int((screendim[1] - 20) - (player1.y + player1.size[1]/2))
         player1.move(0, fallspeed)
         fallspeed += 1
 
     platform1.draw()
-
+    
     player1.move()
     player1.draw()
+
+    # pygame.draw.circle(windowSurfaceObj, clrGreen, (player1.x, (player1.y + player1.size[1]//2)), 5) #draws circle at bottom of player
 
     # print("tick")
 
