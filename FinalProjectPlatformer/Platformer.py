@@ -71,7 +71,7 @@ player1 = player(10, clrWhite, 100, 50, screendim[0]//2, screendim[1]//2)
 platform1 = platform(clrRed, 40, screendim[0], screendim[0]//2, screendim[1])
 
 while runGame:
-    windowSurfaceObj.fill(clrBlack)	
+    # windowSurfaceObj.fill(clrBlack)	
 
     #region Events
     for event in pygame.event.get():
@@ -140,7 +140,7 @@ while runGame:
     player1.move()
     player1.draw()
 
-    pygame.draw.circle(windowSurfaceObj, clrGreen, (player1.x, (player1.y + player1.size[1]//2)), 5) #draws circle at bottom of player
+    # pygame.draw.circle(windowSurfaceObj, clrGreen, (player1.x, (player1.y + player1.size[1]//2)), 5) #draws circle at bottom of player
 
     pygame.display.update()
     fpsClock.tick(60)
