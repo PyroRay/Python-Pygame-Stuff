@@ -1,8 +1,10 @@
-#Ray Peng
-#Platforming game
-#Mr Blake
+# Ray Peng
+# Platforming game
+# Mr Blake
 
-#possible sprites: opengameart.org
+# possible sprites: opengameart.org
+
+# 'W' to jump, 'A' to move left, 'D' to move right
 
 import pygame, sys, random, math
 from pygame.locals import *
@@ -26,7 +28,7 @@ fallspeed = 5
 class player:
     def __init__(self, speed, color, height, width, xset, yset, falling = False):
         # self.image = pygame.image.load('squirrel.png')
-        self.radius = 15 #basically the size
+        self.radius = 15 # possibly will be the size of the final character
         self.direction = ""
         self.speed = speed
         self.color = color
@@ -55,8 +57,6 @@ class platform:
         pygame.draw.rect(windowSurfaceObj, (self.color), (self.x - self.size[0]//2, self.y - self.size[1]//2, self.size[0], self.size[1]))
         pygame.draw.circle(windowSurfaceObj, clrBlack, (self.x, self.y), 5)
 
-
-
 def onGround(plr):
     # print(plr.y)
     if plr.y + plr.size[1]/2 >= screendim[1]-20:
@@ -68,10 +68,10 @@ def jump(plr, jumptime):
     plr.move(0, -jumptime)
 
 player1 = player(10, clrWhite, 100, 50, screendim[0]//2, screendim[1]//2)
-platform1 = platform(clrRed, 40, screendim[0], screendim[0]//2, screendim[1])
+platforms = [platform(clrRed, 40, screendim[0], screendim[0]//2, screendim[1]), platform(clrRed, 40, 100, 500, 600)] # creates array of platforms
 
 while runGame:
-    # windowSurfaceObj.fill(clrBlack)	
+    windowSurfaceObj.fill(clrBlack)	
 
     #region Events
     for event in pygame.event.get():
@@ -135,8 +135,9 @@ while runGame:
         player1.move(0, fallspeed)
         fallspeed += 1
 
-    platform1.draw()
-    
+    platforms[0].draw()
+    platforms[1].draw()
+
     player1.move()
     player1.draw()
 
