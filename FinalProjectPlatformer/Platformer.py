@@ -156,7 +156,8 @@ while runGame:
         player1.move(0, fallspeed)
         fallspeed += 1
 
-    platforms[0].draw()
+    for x in range(0, len(platforms)):
+        platforms[x-1].draw()
 
     player1.move()
     player1.draw()
