@@ -25,6 +25,7 @@ runGame = True
 jumptime = 0
 fallspeed = 5
 _DEBUG = True
+highestplaty = screendim[1]
 
 class solids:
     def __init__(self, color, height, width, xset, yset):
@@ -69,23 +70,18 @@ class platform(solids):
 
 # (color, height, width, xset, yset, speed, falling=False) # player constructor
 player1 = player(clrWhite, 100, 50, screendim[0]//2, screendim[1]//2, 10)
-platforms = [platform(clrRed, 40, 100, 500, 600)] # creates array of platforms
+platforms = [platform(clrRed, 40, 100, 500, 600), platform(clrRed, 40, screendim[0], screendim[0]//2, screendim[1])] # creates array of platforms
 
 # platform(clrRed, 40, screendim[0], screendim[0]//2, screendim[1]),
 
 def onGround(plr):
-    # print(plr.y)
-    # TODO: For each platform whose x_min is < x_min_player and x_max > x_max_player, 
-    # check if bottom_player is touching top_platform
     
     for platform in platforms:
         if platform.leftx() < plr.rightx() and platform.rightx() > plr.leftx():
-            print("on platform")
-            
-    # if plr.y + plr.size[1]/2 >= screendim[1]-20:
-    #     return True
-    # else:
-    #     return False
+            if platform.topy() == plr.boty():
+                return True
+            else:
+                return False
 
 def jump(plr, jumptime):
     plr.move(0, -jumptime)
@@ -125,6 +121,7 @@ while runGame:
             elif event.key == pygame.K_d:
                 # print("\'d\' key was let go")
                 right_pressed = False
+    #endregion
 
     if left_pressed:
         player1.move(-player1.speed)
@@ -150,9 +147,17 @@ while runGame:
         player1.falling = True # player starts falling
         jumptime = -5 # prevents player from 'jumping' in the air
 
+
     if player1.falling:
-        if fallspeed > (screendim[1]-20) - (player1.y + player1.size[1]/2): # if the player's falling vector is larger than the distance to the ground
-            fallspeed = int((screendim[1] - 20) - (player1.y + player1.size[1]/2)) # changes the vector to the distance between the player and the ground, therefore falling directly onto the surface
+        for platform in platforms:
+            if platform.leftx() < player1.rightx() and platform.rightx() > player1.leftx():
+                if highestplaty > platform.topy() and player1.boty() < platform.topy():
+                    highestplaty = platform.topy()
+                if fallspeed > platform.topy() - player1.boty(): # if the player's falling vector is larger than the distance to the ground
+                    if highestplaty == platform.topy():
+                        fallspeed = int(platform.topy() - player1.boty()) # changes the vector to the distance between the player and the ground, therefore falling directly onto the surface
+            else:
+                highestplaty = screendim[1]
         player1.move(0, fallspeed)
         fallspeed += 1
 
