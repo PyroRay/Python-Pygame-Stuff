@@ -28,23 +28,24 @@ _DEBUG = True
 highestplaty = screendim[1]
 
 class solids:
-    def __init__(self, color, height, width, xset, yset):
+    def __init__(self, color, height, width, xset, yset, rightbound, topbound, leftbound, botbound):
         self.size = (width, height)
         self.color = color
         self.x = xset
         self.y = yset
+        self.boundary= {"v1":pygame.Vector2(leftbound, botbound), "v2":pygame.Vector2(rightbound, topbound)}
 
-    def leftx(self): # x of left side
-        return self.x - self.size[0]//2
+    def leftx(self, hypox=self.x): # x coord of left side (hypox is an hypothetical x coord)
+        return hypox - self.size[0]//2
 
-    def rightx(self): # x of right side
-        return self.x + self.size[0]//2
+    def rightx(self, hypox=self.x): # x coord of right side (hypox is an hypothetical x coord)
+        return hypox + self.size[0]//2
 
-    def topy(self): # y of top
-        return self.y - self.size[1]//2
+    def topy(self, hypoy=self.y): # y of top (hypoy is an hypothetical y coord)
+        return hypoy - self.size[1]//2
 
-    def boty(self): # y of bottom
-        return self.y + self.size[1]//2
+    def boty(self, hypoy=self.y): # y of bottom (hypoy is an hypothetical y coord)
+        return hypoy + self.size[1]//2
 
     def draw(self):
         pygame.draw.rect(windowSurfaceObj, (self.color), (self.leftx(), self.topy(), self.size[0], self.size[1]))
@@ -61,6 +62,29 @@ class player(solids):
         super().__init__(color, height, width, xset, yset)
     
     def move(self, dirx = 0, diry = 0):
+        # if player is moving down # check v1.y
+            # if boty(self.y + diry) > self.boundry.v1.y: # check if hypothetical pos_y of player's bottom side is > bottom bounds
+                # self.y = self.topy(self.boundry.v1.y) # set bottom side to be at the bottom bound edge
+            # else:
+                # self.y += diry
+        # elif player is moving up # check v2.y
+            # if topy(self.y + diry) < self.boundry.v2.y: # check if hypothetical pos_y of player's top side is < top bounds
+                # self.y = self.boty(self.boundry.v2.y) # set top side to be at the top bound edge
+            # else:
+                # self.y += diry
+                
+        # if player is moving left # check v1.y
+            # if self.leftx(self.x + dirx) < self.boundry.v1.x: # check if hypothetical pos_x of player's left side is < left bounds
+                # self.x = rightx(self.boundry.v1.x) # set left side to be at the left bound edge
+            # else:
+                # self.x += dirx
+
+        # elif player is moving right # check v2.x
+            # if rightx(self.x + dirx) > self.boundry.v2.x: # check if hypothetical pos_x of player's right side is > right bounds
+                # self.x = self.leftx(self.boundry.v2.x) # set right side to be at the right bound edge
+            # else:
+                # self.x += dirx
+
         self.x += dirx
         self.y += diry
 
@@ -70,7 +94,7 @@ class platform(solids):
 
 # (color, height, width, xset, yset, speed, falling=False) # player constructor
 player1 = player(clrWhite, 100, 50, screendim[0]//2, screendim[1]//2, 10)
-platforms = [platform(clrRed, 40, 100, 500, 600), platform(clrRed, 40, screendim[0], screendim[0]//2, screendim[1])] # creates array of platforms
+platforms = [platform(clrRed, 40, screendim[0], screendim[0]//2, screendim[1]), platform(clrRed, 40, 100, 500, 600)] # creates array of platforms
 
 # platform(clrRed, 40, screendim[0], screendim[0]//2, screendim[1]),
 
@@ -150,10 +174,10 @@ while runGame:
 
     if player1.falling:
         for platform in platforms:
-            if platform.leftx() < player1.rightx() and platform.rightx() > player1.leftx():
+            if platform.leftx() < player1.rightx() and platform.rightx() > player1.leftx(): # check if player is within horizonta range of platform
                 if player1.boty() < platform.topy():
                     highestplaty = platform.topy()
-                if fallspeed > platform.topy() - player1.boty(): # if the player's falling vector is larger than the distance to the ground
+                if fallspeed > platform.topy() - player1.boty(): # if the player's falling speed is larger than the distance to the ground
                     if highestplaty == platform.topy():
                         fallspeed = int(platform.topy() - player1.boty()) # changes the vector to the distance between the player and the ground, therefore falling directly onto the surface
             else:
