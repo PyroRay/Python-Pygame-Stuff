@@ -151,7 +151,7 @@ while runGame:
     if player1.falling:
         for platform in platforms:
             if platform.leftx() < player1.rightx() and platform.rightx() > player1.leftx():
-                if highestplaty > platform.topy() and player1.boty() < platform.topy():
+                if player1.boty() < platform.topy():
                     highestplaty = platform.topy()
                 if fallspeed > platform.topy() - player1.boty(): # if the player's falling vector is larger than the distance to the ground
                     if highestplaty == platform.topy():
