@@ -120,7 +120,7 @@ class platform(solids):
 
 # (color, height, width, xset, yset, rightbound, topbound, leftbound, botbound, speed, falling=False) # player constructor
 player1 = player(clrWhite, 100, 50, screendim[0]//2, screendim[1]//2, screendim[1], 0, screendim[0], 0, 10)
-platforms = [platform(clrRed, 40, screendim[0], screendim[0]//2, 0, 0, 0, 0, 0), platform(clrRed, 40, 100, 500, 550, screendim[1], 0, screendim[0], 0), platform(clrRed, 40, screendim[0], screendim[0]//2, screendim[1], 0, 0, 0, 0)] # creates array of platforms
+platforms = [platform(clrRed, 40, screendim[0], screendim[0]//2, 0, 0, 0, 0, 0), platform(clrRed, 40, 100, 800, 600, screendim[1], 0, screendim[0], 0), platform(clrRed, 40, 100, 500, 550, screendim[1], 0, screendim[0], 0), platform(clrRed, 40, screendim[0], screendim[0]//2, screendim[1], 0, 0, 0, 0)] # creates array of platforms
 
 # platform(clrRed, 40, screendim[0], screendim[0]//2, screendim[1]),
 
