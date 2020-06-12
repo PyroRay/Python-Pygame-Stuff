@@ -237,7 +237,7 @@ class Hurtbox:
 						if i.owner == x.owner and i.direction == x.direction:
 							x.enabled = False
 					player_list[self.owner].acceleration = i.knockback + Vector2(i.knockback.x * i.multiplyer * (2 - player_list[self.owner].weight) * (player_list[self.owner].percent / 100.0), i.knockback.y * i.multiplyer * (2.0 - player_list[self.owner].weight) * (player_list[self.owner].percent / 100.0))
-					print player_list[self.owner].acceleration, i.knockback, i.multiplyer, 2 - player_list[self.owner].weight, player_list[self.owner].percent / 100.0
+					print(player_list[self.owner].acceleration, i.knockback, i.multiplyer, 2 - player_list[self.owner].weight, player_list[self.owner].percent / 100.0)
 					player_list[self.owner].percent += i.damage
 					player_list[self.owner].velocity = Vector2(0,0)
 		
@@ -326,11 +326,11 @@ class Terrain:
 
 class Effects:
 	def __init__(self):
-		print ""
+		print("")
 
 class Buffs:
 	def __init__(self):
-		print ""
+		print("")
 
 #endregion
 

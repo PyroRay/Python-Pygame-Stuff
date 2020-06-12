@@ -6,11 +6,10 @@
 
 # 'W' to jump, 'A' to move left, 'D' to move right
 
-import pygame, sys, random, math, os
+import pygame, sys, random, math
 from pygame.locals import *
 
 windowSurfaceObj = pygame.display.set_mode((1280, 720))
-dir_path = os.path.dirname(os.path.realpath(__file__))
 pygame.display.set_caption('Platformer')
 fpsClock = pygame.time.Clock()
 clrBlack = pygame.Color(0, 0, 0)
@@ -32,11 +31,7 @@ rightmostplatx = screendim[0]
 leftmostplatx = 0
 vectorx = 0
 vectory = 0
-stagenum = 0
-animImages = [pygame.image.load(dir_path + r'\Sprites\Main Character\charIdle.png'), pygame.image.load(dir_path + r'\Sprites\Main Character\charJumpRight.png'), pygame.image.load(dir_path + r'\Sprites\Main Character\charWalk1Right.png'), pygame.image.load(dir_path + r'\Sprites\Main Character\charWalk2Right.png'), pygame.image.load(dir_path + r'\Sprites\Main Character\charJumpLeft.png'), pygame.image.load(dir_path + r'\Sprites\Main Character\charWalk1Left.png'), pygame.image.load(dir_path + r'\Sprites\Main Character\charWalk2Left.png')]
-animNum = 0
-animArrayNum = 0
-animTimer = 0
+stagenum = 1
 
 class Solids:
     def __init__(self, color, height, width, xset, yset, rightbound, topbound, leftbound, botbound):
@@ -159,28 +154,6 @@ class Player(Solids):
                 
         # self.x += dirx
         # self.y += diry
-    def animate(self, onground):
-        if left_pressed:
-            if onground:
-                if animNum == 1:
-                    windowSurfaceObj.blit(animImages[5], (self.leftx(), self.topy()))
-                elif animNum == 2:
-                    windowSurfaceObj.blit(animImages[6], (self.leftx(), self.topy()))
-            elif not(onground):
-                windowSurfaceObj.blit(animImages[4], (self.leftx(), self.topy()))
-        elif right_pressed:
-            if onground:
-                if animNum == 1:
-                    windowSurfaceObj.blit(animImages[2], (self.leftx(), self.topy()))
-                elif animNum == 2:
-                    windowSurfaceObj.blit(animImages[3], (self.leftx(), self.topy()))
-            elif not(onground):
-                windowSurfaceObj.blit(animImages[1], (self.leftx(), self.topy()))
-        else:
-            windowSurfaceObj.blit(animImages[0], (self.leftx(), self.topy()))
-
-        
-
 
 class Platform(Solids):
     def __init__(self, color, height, width, xset, yset, rightbound, topbound, leftbound, botbound,):
@@ -191,10 +164,10 @@ class Prize(Solids):
         super().__init__(color, height, width, xset, yset, rightbound, topbound, leftbound, botbound)
 
 # (color, height, width, xset, yset, rightbound, topbound, leftbound, botbound, speed, falling=False) # constructor
-player1 = Player(clrWhite, 100, 50, 25, 600, screendim[0], 0, 0, screendim[1], 10)
+player1 = Player(clrWhite, 100, 50, 25, screendim[1]//2, screendim[0], 0, 0, screendim[1], 10)
 platformsP1 = [[Platform(clrRed, 40, 100, 200, 600, screendim[0], 0, 0, screendim[1]), Platform(clrRed, 40, 100, 800, 500, screendim[0], 0, 0, screendim[1]), Platform(clrRed, 40, 100, 500, 575, screendim[0], 0, 0, screendim[1]), Platform(clrRed, 400, 40, screendim[0], 520, screendim[0], 0, 0, screendim[1]), Platform(clrRed, 40, 150, 1205, 320, screendim[0], 0, 0, screendim[1]), Platform(clrRed, 40, screendim[0], screendim[0]//2, screendim[1], screendim[0], 0, 0, screendim[1])], [Platform(clrRed, 40, 800, 600, 250, screendim[0], 0, 0, screendim[1]), Platform(clrRed, 40, 100, 100, 450, screendim[0], 0, 0, screendim[1]), Platform(clrRed, 40, 100, 800, 550, screendim[0], 0, 0, screendim[1]), Platform(clrRed, 40, 100, 500, 500, screendim[0], 0, 0, screendim[1]), Platform(clrRed, 500, 40, 1100, 470, screendim[0], 0, 0, screendim[1]), Platform(clrRed, 40, 200, 1200, 320, screendim[0], 0, 0, screendim[1]), Platform(clrRed, 40, screendim[0], screendim[0]//2, screendim[1], screendim[0], 0, 0, screendim[1])]] # creates array of stages and then ansub-array of platforms
 prizes = [Prize(clrGreen, 120, 60, 1205, 240, screendim[0], 0, 0, screendim[1]), Prize(clrGreen, 120, 60, 1205, 240, screendim[0], 0, 0, screendim[1])]
-spawnlocations = [600, 25]
+spawnlocations = [25, 50]
 
 # platform(clrRed, 40, screendim[0], screendim[0]//2, screendim[1]),
 
@@ -217,7 +190,7 @@ def onGround(plr):
 
 def jump(plr, jumptime):
     plr.move(0, -jumptime)
-    
+
 
 while runGame:
     windowSurfaceObj.fill(clrBlack)	
@@ -297,7 +270,7 @@ while runGame:
                 if topplaty == platform.topy():
                     if player1.boty() <= platform.topy():
                         player1.boundary.bottomleft.y = topplaty
-                        # print("reset bottom", player1.boundary.bottomleft.y)
+                        print("reset bottom", player1.boundary.bottomleft.y)
                             # print(topplaty)
                             # print(player1.boundary.bottomleft.y)
 
@@ -307,18 +280,18 @@ while runGame:
                 if botplaty == platform.boty():
                     if player1.topy() >= platform.boty():
                         player1.boundary.topright.y = botplaty
-                        # print("reset top", player1.boundary.topright.y)
+                        print("reset top", player1.boundary.topright.y)
                         # print(player1.boundary.topright.y)
 
         else:
             if topplaty == platform.topy():
                 player1.boundary.bottomleft.y = screendim[1]
                 topplaty = screendim[1]
-                # print("reset bottom", player1.boundary.bottomleft.y)
+                print("reset bottom", player1.boundary.bottomleft.y)
             if botplaty == platform.boty():
                 player1.boundary.topright.y = 0
                 botplaty = 0
-                # print("reset top", player1.boundary.topright.y)
+                print("reset top", player1.boundary.topright.y)
 
     if player1.falling:
         player1.move(0, fallspeed)
@@ -376,22 +349,11 @@ while runGame:
     # print("left", player1.boundary.bottomleft.x)
     # print("right", player1.boundary.topright.x)
 
-    if animTimer % 15 == 0:
-        animTimer = 0
-        if animNum % 2 == 0:
-            animNum = 0
-        animNum += 1
-    animTimer += 1
-    # print(animTimer)
-    # print(animNum)
-
     prizes[stagenum].draw()
     player1.move(vectorx)
-    # player1.draw()
+    player1.draw()
 
-    player1.animate(playerOnGround)
-
-    # pygame.draw.circle(windowSurfaceObj, clrGreen, (int(player1.x), int(player1.y)), 5) #draws circle at bottom of player
+    pygame.draw.circle(windowSurfaceObj, clrGreen, (int(player1.x), int(player1.y)), 5) #draws circle at bottom of player
 
     pygame.display.update()
     fpsClock.tick(60)
