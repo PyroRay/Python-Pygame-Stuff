@@ -30,7 +30,8 @@ game_screen = pygame.display.set_mode(v2_to_int_tuple(screen_dimensions))
 screen_centre = screen_dimensions / 2
 pygame.display.set_caption("3xCSL")
 
-monospace = pygame.font.SysFont("monospace", 50)
+font = pygame.font.SysFont("", 80)
+debugtext = font.render("debug mode", True, (255,0,0))
 title_image = pygame.image.load("Title.png")#.convert_alpha()
 
 character_choice = [0,0]
@@ -38,7 +39,7 @@ mapnumber = 0
 
 game_clock = pygame.time.Clock()
 game_state = "init"
-
+debug_mode = True
 
 
 #endregion
@@ -62,6 +63,8 @@ class Player:
 
 		self.dimensions = character_data[self.charnumber]["stats"]["dimensions"]
 
+		self.spawnhitbox = character_data[self.charnumber]["stats"]["spawnhitbox"]
+
 	def spawn(self):
 		self.state = "air"
 		self.substate = "idle"
@@ -71,6 +74,7 @@ class Player:
 
 		self.jump = False
 		self.onterrain = 0
+		self.damageboost = 1
 		
 		self.animationframe = 0
 
@@ -79,7 +83,7 @@ class Player:
 		self.acceleration = Vector2(0,0)
 
 	def check(self):
-		if keydic[self.number]["up"] and self.jump:
+		if keydic[self.number]["up"] and self.jump and self.substate != "attack":
 				self.jump = False
 				self.state = "air"
 				self.substate = "idle"
@@ -116,8 +120,8 @@ class Player:
 					self.velocity.x += 2
 					self.direction = "right"
 			if abs(self.velocity.x) > self.walkspeed:
-				self.velocity.x *= 0.8
-			self.acceleration.x *= 0.8
+				self.velocity.x *= 0.5
+			self.acceleration.x *= 0.7
 			self.acceleration.y *= 0.5
 			
 		elif self.state == "ground":
@@ -134,7 +138,7 @@ class Player:
 					else:
 						self.substate = "idle"
 						self.animationframe = 0
-				elif self.substate == "idle" and keydic[self.number]["attack"]:
+				elif keydic[self.number]["attack"]:
 					self.attack()
 				elif keydic[self.number]["left"]:
 					self.substate = "walk"
@@ -148,8 +152,8 @@ class Player:
 						self.velocity.x += 4
 				else:
 					self.substate = "idle"
-					self.velocity.x *= 0.5
-				self.acceleration.x *= 0.2
+					self.velocity.x *= 0.3
+				self.acceleration.x *= 0.7
 	
 	def attack(self):
 		self.substate = "attack"
@@ -157,7 +161,7 @@ class Player:
 
 		if keydic[self.number]["up"]:
 			self.attackdirection = "up"
-		elif keydic[self.number]["down"] and self.state == "air":
+		elif keydic[self.number]["down"]:
 			self.attackdirection = "down"
 		elif keydic[self.number]["left"]:
 			self.attackdirection = "left"
@@ -170,7 +174,10 @@ class Player:
 		self.attackframes = character_data[self.charnumber]["attacks"][self.attackdirection]["attackframes"]
 
 		for x in range(len(character_data[self.charnumber]["attacks"][self.attackdirection]["hitboxes"])):
-			hitbox_list.append(Hitbox(self.number, self.charnumber, x, self.attackdirection))
+			hitbox_list.append(Hitbox(self.number, self.charnumber, x, self.attackdirection, None))
+		
+		for x in range(len(character_data[self.charnumber]["attacks"][self.attackdirection]["visual"])):
+			visual_list.append(Visual(self.number, self.charnumber, x, self.attackdirection, None))
 	
 	def draw(self):
 		pygame.draw.rect(game_screen, (0,0,0), (v2_to_int_tuple(loc_to_draw_loc(self.location, self.dimensions)), v2_to_int_tuple(self.dimensions)), 0)
@@ -183,9 +190,6 @@ class Player:
 		self.location += self.velocity
 
 		self.draw()
-		
-		
-		
 
 class Hurtbox:
 	def __init__(self, owner):
@@ -200,8 +204,9 @@ class Hurtbox:
 		self.nextlocation = player_list[self.owner].location + player_list[self.owner].velocity
 
 		self.check()
-
-		pygame.draw.circle(game_screen, (0,255,0), (v2_to_int_tuple(loc_to_draw_loc(self.location, Vector2(0,0)))), int(self.radius))
+		
+		if debug_mode:
+			pygame.draw.circle(game_screen, (0,255,0), (v2_to_int_tuple(loc_to_draw_loc(self.location, Vector2(0,0)))), int(self.radius))
 
 	def check(self):
 		if player_list[self.owner].state == "air" and player_list[self.owner].substate == "walk":
@@ -234,22 +239,35 @@ class Hurtbox:
 			if i.owner != self.owner and i.enabled:
 				if Vector2.distance_to(self.location, i.location) < (self.radius + i.radius):
 					for x in hitbox_list:
-						if i.owner == x.owner and i.direction == x.direction:
+						if i.owner == x.owner and i.direction == x.direction and x.direction != "misc":
 							x.enabled = False
-					player_list[self.owner].acceleration = i.knockback + Vector2(i.knockback.x * i.multiplyer * (2 - player_list[self.owner].weight) * (player_list[self.owner].percent / 100.0), i.knockback.y * i.multiplyer * (2.0 - player_list[self.owner].weight) * (player_list[self.owner].percent / 100.0))
-					print(player_list[self.owner].acceleration, i.knockback, i.multiplyer, 2 - player_list[self.owner].weight, player_list[self.owner].percent / 100.0)
-					player_list[self.owner].percent += i.damage
-					player_list[self.owner].velocity = Vector2(0,0)
+
+					for y in visual_list:
+						if i.owner == y.owner and i.location == y.location and i.direction == y.direction and y.sync:
+							y.enabled = False		
+					i.enabled = False
+					if i.knockback != Vector2(0,0):
+						player_list[self.owner].acceleration = i.knockback + Vector2(i.knockback.x * i.multiplyer * (2 - player_list[self.owner].weight) * (player_list[self.owner].percent / 100.0), i.knockback.y * i.multiplyer * (2.0 - player_list[self.owner].weight) * (player_list[self.owner].percent / 100.0))
+						player_list[self.owner].velocity = Vector2(0,0)
+						player_list[self.owner].location += Vector2(5,0)
+					player_list[self.owner].percent += (i.damage * player_list[i.owner].damageboost) + player_list[self.owner].percent / 50.0
 		
 		if self.location.x < -150 or self.location.x > screen_dimensions.x + 150 or self.location.y < -150 or self.location.y > screen_dimensions.y + 150:
 			player_list[self.owner].lives -= 1
 			player_list[self.owner].spawn()
+		
+		for i in buff_list:
+			if Vector2.distance_to(self.location, i.location) < (self.radius + i.radius):
+				player_list[self.owner].damageboost = i.damageboost
+			else:
+				player_list[self.owner].damageboost = 1
+
 
 class Hitbox:
-	def __init__(self, owner, character, number, direction):
+	def __init__(self, owner, character, number, direction, location):
 		self.owner = owner
-		self.number = number
 		self.character = character
+		self.number = number
 		self.direction = direction
 		self.enabled = True
 		self.animationframe = 0
@@ -264,36 +282,89 @@ class Hitbox:
 		self.offset = character_data[self.character]["attacks"][self.direction]["hitboxes"][self.number]["offset"]
 		self.velocity = character_data[self.character]["attacks"][self.direction]["hitboxes"][self.number]["velocity"]
 
-		self.location = player_list[self.owner].location + self.offset
+		self.location = location
+		if self.location == None:
+			self.location = player_list[self.owner].location + self.offset
 		
 		self.duration = character_data[self.character]["attacks"][self.direction]["hitboxes"][self.number]["duration"]
 
 	def update(self):
-		if self.animationframe <= self.duration:
-			self.animationframe += 1
-		elif self.enabled:
-			self.enabled = False
-
-		if self.lock:
-			self.location = player_list[self.owner].location + self.offset
-		else:
-			self.location += self.velocity
-
 		if self.enabled:
-			pygame.draw.circle(game_screen, (255,0,0), (v2_to_int_tuple(loc_to_draw_loc(self.location, Vector2(0,0)))), self.radius)
+			if self.animationframe < self.duration:
+				self.animationframe += 1
+			else:
+				self.end()
+			
+			if self.lock:
+				self.location = player_list[self.owner].location + self.offset
+			else:
+				self.location += self.velocity
+
+				for i in terrain_list:
+					if (self.location.y <= i.topbound + self.radius and self.location.y > i.botbound - self.radius) and (self.location.x < i.rightbound + self.radius and self.location.x > i.leftbound - self.radius) and player_list[self.owner].spawnhitbox and self.direction != "misc":
+						self.end()
+			
+			if debug_mode:
+				pygame.draw.circle(game_screen, (255,0,0), (v2_to_int_tuple(loc_to_draw_loc(self.location, Vector2(0,0)))), self.radius)
 		
+	def end(self):
+		self.enabled = False
+		if player_list[self.owner].spawnhitbox and self.direction != "misc":
+			hitbox_list.append(Hitbox(self.owner, self.character, 0, "misc", self.location))
+			visual_list.append(Visual(self.owner, self.character, 0, "misc", self.location))
+
+class Visual:
+	def __init__(self, owner, character, number, direction, location):
+		self.owner = owner
+		self.character = character
+		self.number = number
+		self.direction = direction
+		self.enabled = True
+		self.animationframe = 0
+		
+		self.lock = character_data[self.character]["attacks"][self.direction]["visual"][self.number]["lock"]
+		self.sync = character_data[self.character]["attacks"][self.direction]["visual"][self.number]["sync"]
+
+		self.dimensions = character_data[self.character]["attacks"][self.direction]["visual"][self.number]["dimensions"]
+		self.offset = character_data[self.character]["attacks"][self.direction]["visual"][self.number]["offset"]
+		self.velocity = character_data[self.character]["attacks"][self.direction]["visual"][self.number]["velocity"]
+
+		self.location = location
+		if self.location == None:
+			self.location = player_list[self.owner].location + self.offset
+		
+		self.duration = character_data[self.character]["attacks"][self.direction]["visual"][self.number]["duration"]
+
+		self.draw()
+
+	def update(self):
+		if self.enabled:
+			if self.animationframe < self.duration:
+				self.animationframe += 1
+			else:
+				self.enabled = False
+			
+			if self.lock:
+				self.location = player_list[self.owner].location + self.offset
+			else:
+				self.location += self.velocity
+
+			self.draw()
+
+	def draw(self):
+		pygame.draw.rect(game_screen, (0,0,0), (v2_to_int_tuple(loc_to_draw_loc(self.location, self.dimensions)), v2_to_int_tuple(self.dimensions)), 0)
 
 class Terrain:
 	def __init__(self, mapnumber, number):
 		self.number = number
 		self.map = mapnumber
 
-		self.platform = stage_data[self.map][self.number]["platform"]
-		self.dimensions = stage_data[self.map][self.number]["dimensions"]
-		self.location = stage_data[self.map][self.number]["location"]
-		self.velocity = stage_data[self.map][self.number]["velocity"]
-		self.minloc = stage_data[self.map][self.number]["minimum"]
-		self.maxloc = stage_data[self.map][self.number]["maximum"]
+		self.platform = stage_data[self.map]["platforms"][self.number]["platform"]
+		self.dimensions = stage_data[self.map]["platforms"][self.number]["dimensions"]
+		self.location = stage_data[self.map]["platforms"][self.number]["location"]
+		self.velocity = stage_data[self.map]["platforms"][self.number]["velocity"]
+		self.minloc = stage_data[self.map]["platforms"][self.number]["minimum"]
+		self.maxloc = stage_data[self.map]["platforms"][self.number]["maximum"]
 		
 		self.leftbound = self.location.x - (self.dimensions.x / 2)
 		self.rightbound = self.location.x + (self.dimensions.x / 2)
@@ -320,17 +391,19 @@ class Terrain:
 			if (self.location.x > self.maxloc.x) or (self.location.x < self.minloc.x) or (self.location.y > self.maxloc.y) or (self.location.y < self.minloc.y):
 				self.velocity = Vector2(self.velocity.x * -1, self.velocity.y * -1)
 				self.location += self.velocity
-				#print self.location, self.minloc, self.maxloc
 
 		self.location += self.velocity
 
-class Effects:
-	def __init__(self):
-		print("")
-
-class Buffs:
-	def __init__(self):
-		print("")
+class Buff:
+	def __init__(self, mapnumber, number):
+		self.number = number
+		self.map = mapnumber
+		self.location = stage_data[self.map]["buffs"][self.number]["location"]
+		self.radius = stage_data[self.map]["buffs"][self.number]["radius"]
+		self.damageboost = stage_data[self.map]["buffs"][self.number]["damageboost"]
+	
+	def update(self):
+		pygame.draw.circle(game_screen, (180,214,255), (v2_to_int_tuple(loc_to_draw_loc(self.location, Vector2(0,0)))), self.radius)
 
 #endregion
 
@@ -373,6 +446,11 @@ while game_state != "stop":
 				keydic[2]["enter"] = True
 			elif event.key == pygame.K_ESCAPE:
 				keydic[2]["escape"] = True
+			elif event.key == pygame.K_F12:
+				if debug_mode:
+					debug_mode = False
+				else:
+					debug_mode = True
 
 			elif event.key == pygame.K_1:
 				mapnumber = 0
@@ -427,36 +505,59 @@ while game_state != "stop":
 		hurtbox_list = []
 		hitbox_list = []
 		terrain_list = []
+		visual_list = []
+		buff_list = []
 		game_state = "title"
 
 	elif game_state == "title":
 		game_screen.blit(image_list["game"]["title"], (0,0))
-		if keydic[2]["escape"]:
-			game_state = "stop"
-		elif keydic[2]["enter"]:
+
+		if debug_mode:
+			game_screen.blit(debugtext, (0,0))
+
+		if keydic[2]["enter"]:
 			for a in range(2):
 				player_list.append(Player(a))
 				player_list[a].spawn()
 				hurtbox_list.append(Hurtbox(a))
-			for b in range(len(stage_data[mapnumber])):
+			for b in range(len(stage_data[mapnumber]["platforms"])):
 				terrain_list.append(Terrain(mapnumber,b))
+			for c in range(len(stage_data[mapnumber]["buffs"])):
+				buff_list.append(Buff(mapnumber,c))
 			game_state = "game"
 	elif game_state == "game":
 
 		if keydic[2]["escape"]:
 			game_state = "init"
 
-		game_screen.fill((255,255,255))
+		game_screen.fill((240,254,255))
 
-		percent = monospace.render(str(player_list[0].percent) + "%", False, (0,0,0))
-		displaystate = monospace.render(player_list[1].state, False, (0,0,0))
-		displaysubstate = monospace.render(player_list[1].substate, False, (0,0,0))
-		displayjump = monospace.render(str(player_list[1].jump), False, (0,0,0))
-		game_screen.blit(percent, (0,0))
-		game_screen.blit(displaystate, (0,40))
-		game_screen.blit(displaysubstate, (0,80))
-		game_screen.blit(displayjump, (0,120))
+		p1percent = font.render(str(int(player_list[0].percent)) + "%", True, (0,0,0))
+		p2percent = font.render(str(int(player_list[1].percent)) + "%", True, (0,0,0))
+
+		game_screen.blit(p1percent, (20,20))
+		game_screen.blit(p2percent, (screen_dimensions.x - (len(str(int(player_list[1].percent))) * 30) - 85, 20))
+
+		if debug_mode:
+			p1state = font.render(player_list[0].state, True, (255,0,0))
+			p1subsstate = font.render(player_list[0].substate, True, (255,0,0))
+			p1jump = font.render(str(player_list[0].jump), True, (255,0,0))
+
+			p2state = font.render(player_list[1].state, True, (255,0,0))
+			p2substate = font.render(player_list[1].substate, True, (255,0,0))
+			p2jump = font.render(str(player_list[1].jump), True, (255,0,0))
+
+			game_screen.blit(p1state, (20,80))
+			game_screen.blit(p1subsstate, (20,140))
+			game_screen.blit(p1jump, (20,200))
+
+			game_screen.blit(p2state, (screen_dimensions.x - ((len(player_list[1].state) * 20) + 90), 80))
+			game_screen.blit(p2substate, (screen_dimensions.x - ((len(player_list[1].substate) * 20) + 90), 140))
+			game_screen.blit(p2jump, (screen_dimensions.x - ((len(str(player_list[1].jump)) * 20) + 90), 200))
 		
+		for x in buff_list:
+			x.update()
+
 		for x in terrain_list:
 			x.update()
 
@@ -468,8 +569,13 @@ while game_state != "stop":
 		for x in hurtbox_list:
 			x.update()
 
+		for x in visual_list:
+			x.update()
+
 		for x in hitbox_list:
 			x.update()
+
+		
 
 	pygame.display.update()		
 	game_clock.tick(60)
