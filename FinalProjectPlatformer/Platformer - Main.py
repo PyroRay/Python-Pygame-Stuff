@@ -2,15 +2,18 @@
 # Platforming game
 # Mr Blake
 
-# possible sprites: opengameart.org
-
 # 'W' to jump, 'A' to move left, 'D' to move right
+
+# region imports
 
 import pygame, sys, random, math, os
 from pygame.locals import *
 
 pygame.init()
-pygame.mixer.init()
+
+# endregion
+
+# region variables
 
 windowSurfaceObj = pygame.display.set_mode((1280, 720))
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -52,6 +55,10 @@ vectorx = 0
 vectory = 0
 stagenum = 0
 restart = False
+
+# endregion
+
+# region classes
 
 class Solids:
     def __init__(self, color, height, width, xset, yset, rightbound, topbound, leftbound, botbound):
@@ -175,6 +182,7 @@ class Player(Solids):
         # self.x += dirx
         # self.y += diry
     def animate(self, onground):
+        # selects image to show based on action and animation timer
         if left_pressed:
             if onground:
                 if animNum == 1:
@@ -194,9 +202,6 @@ class Player(Solids):
         else:
             windowSurfaceObj.blit(animImages[0], (int(self.leftx()), int(self.topy())))
 
-        
-
-
 class Platform(Solids):
     def __init__(self, color, height, width, xset, yset, rightbound, topbound, leftbound, botbound,):
         super().__init__(color, height, width, xset, yset, rightbound, topbound, leftbound, botbound)
@@ -208,21 +213,28 @@ class Prize(Solids):
     def __init__(self, color, height, width, xset, yset, rightbound, topbound, leftbound, botbound,):
         super().__init__(color, height, width, xset, yset, rightbound, topbound, leftbound, botbound)
 
-# windowSurfaceObj.blit(animImages[0], (int(self.leftx()), int(self.topy())))
+# endregion
+
+# region character create
 
 # (color, height, width, xset, yset, rightbound, topbound, leftbound, botbound, speed, falling=False) # constructor
 player1 = Player(clrWhite, 100, 50, 25, 600, screendim[0], 0, 0, screendim[1], 10)
 
-# region Platforms
-platformsP1 = [[Platform(clrDrkGrey, 40, 100, 200, 600, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 100, 800, 500, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 100, 500, 575, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 400, 40, screendim[0], 520, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 150, 1205, 320, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, screendim[0], screendim[0]//2, screendim[1], screendim[0], 0, 0, screendim[1])], \
-    [Platform(clrDrkGrey, 40, 800, 600, 250, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 100, 100, 450, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 100, 800, 550, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 100, 500, 500, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 500, 40, 1100, 470, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, screendim[0], screendim[0]//2, screendim[1], screendim[0], 0, 0, screendim[1])], \
-        [Platform(clrDrkGrey, 40, 50, 200, 600, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 50, 800, 500, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 50, 500, 575, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 400, 40, screendim[0], 520, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 500, 1100, 320, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 600, 40, 870, 500, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 500, 501, 321, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 400, 690, 180, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, screendim[0], screendim[0]//2, screendim[1], screendim[0], 0, 0, screendim[1])]] # creates array of stages and then a sub-array of platforms
-
-prizes = [Prize(clrGreen, 120, 60, 1205, 240, screendim[0], 0, 0, screendim[1]), Prize(clrGreen, 120, 60, 1205, 640, screendim[0], 0, 0, screendim[1]), Prize(clrGreen, 120, 60, 1205, 240, screendim[0], 0, 0, screendim[1])]
-spawnlocations = [600, 25]
 # endregion
 
-# platform(clrRed, 40, screendim[0], screendim[0]//2, screendim[1]),
+# region Stages
+
+platformsP1 = [[Platform(clrDrkGrey, 40, 100, 200, 600, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 100, 800, 500, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 100, 500, 575, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 400, 40, screendim[0], 520, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 150, 1205, 320, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, screendim[0], screendim[0]//2, screendim[1], screendim[0], 0, 0, screendim[1])], \
+    [Platform(clrDrkGrey, 40, 800, 600, 250, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 100, 100, 450, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 100, 800, 550, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 100, 500, 500, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 500, 40, 1100, 470, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, screendim[0], screendim[0]//2, screendim[1], screendim[0], 0, 0, screendim[1])], \
+        [Platform(clrDrkGrey, 40, 50, 200, 600, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 50, 800, 500, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 50, 500, 575, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 400, 40, screendim[0], 520, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 500, 1100, 320, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 600, 40, 870, 500, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 500, 501, 321, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 400, 690, 180, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, screendim[0], screendim[0]//2, screendim[1], screendim[0], 0, 0, screendim[1])]]\
+             # creates array of stages and then a sub-array of platforms in that stage
+
+prizes = [Prize(clrGreen, 120, 60, 1205, 240, screendim[0], 0, 0, screendim[1]), Prize(clrGreen, 120, 60, 1205, 640, screendim[0], 0, 0, screendim[1]), Prize(clrGreen, 120, 60, 1205, 240, screendim[0], 0, 0, screendim[1])] #creates array of prize locations for each stage
+spawnlocation = [600, 25] # where the player will spawn in each level
+
+# endregion
+
+# region functions
 
 def onGround(plr):
     platnum = 0
@@ -244,8 +256,14 @@ def onGround(plr):
 def jump(plr, jumptime):
     plr.move(0, -jumptime)
     
+# endregion
+
+# region main game
 
 while runGame:
+
+    # region start
+
     if gameStart:
         windowSurfaceObj.blit(bckgrdImage, (0, 0))
         pygame.mixer.music.set_volume(0.05)
@@ -256,7 +274,9 @@ while runGame:
         else:
             windowSurfaceObj.blit(startmenu, (0, 0))
 
-    #region Events
+    # endregion
+
+    # region events
     for event in pygame.event.get():
         if event.type == QUIT:
             runGame = False
@@ -294,7 +314,9 @@ while runGame:
             elif event.key == pygame.K_d:
                 # print("\'d\' key was let go")
                 right_pressed = False
-    #endregion
+    # endregion
+
+    # region movements
 
     vectorx = 0
 
@@ -323,43 +345,37 @@ while runGame:
     elif not(playerOnGround) and not(up_pressed): # if player is in air and lets go of 'w'
         player1.falling = True # player starts falling
         jumptime = -5 # prevents player from 'jumping' in the air
-        # print("falling")
+
+    # endregion
+
+    # region bounds
 
     platnum2 = 0
     for platform in platformsP1[stagenum]:
-        platnum2 += 1
-        # print(platnum2)
-        # print(topplaty)
+        # platnum2 += 1
+
         if platform.leftx() < player1.rightx() and platform.rightx() > player1.leftx(): # check if player is within horizontal range of platform
-            if platform.topy() < topplaty:
-                # print(platnum2, platform.topy(), topplaty)
-                if player1.boty() <= platform.topy():
-                    topplaty = platform.topy()
-                if topplaty == platform.topy():
-                    if player1.boty() <= platform.topy():
-                        player1.boundary.bottomleft.y = topplaty
-                        # print("reset bottom", player1.boundary.bottomleft.y)
-                            # print(topplaty)
-                            # print(player1.boundary.bottomleft.y)
+            if platform.topy() < topplaty: # checks if platform is higher than highest platform in that X area
+                if player1.boty() <= platform.topy(): # checks if player is actually above platform
+                    topplaty = platform.topy() # sets highest platform to current platform Y
+                if topplaty == platform.topy(): # checks if highest platform is the current platform
+                    if player1.boty() <= platform.topy(): # checks if player is actually above platform
+                        player1.boundary.bottomleft.y = topplaty # sets player bottom boundary
 
-            if platform.boty() > botplaty:
-                if player1.topy() >= platform.boty():
-                    botplaty = platform.boty()
-                if botplaty == platform.boty():
-                    if player1.topy() >= platform.boty():
-                        player1.boundary.topright.y = botplaty
-                        # print("reset top", player1.boundary.topright.y)
-                        # print(player1.boundary.topright.y)
+            if platform.boty() > botplaty: # checks if platform is lower than lowest platform in that X area
+                if player1.topy() >= platform.boty(): # checks if player is actually below platform
+                    botplaty = platform.boty() # sets lowest platform to current platform Y
+                if botplaty == platform.boty(): # checks if lowest platform is the current platform
+                    if player1.topy() >= platform.boty(): # checks if player is actually below platform
+                        player1.boundary.topright.y = botplaty # sets player top boundary
 
-        else:
-            if topplaty == platform.topy():
-                player1.boundary.bottomleft.y = screendim[1]
-                topplaty = screendim[1]
-                # print("reset bottom", player1.boundary.bottomleft.y)
-            if botplaty == platform.boty():
-                player1.boundary.topright.y = 0
-                botplaty = 0
-                # print("reset top", player1.boundary.topright.y)
+        else: # if not in the bounds of specified platform
+            if topplaty == platform.topy(): # checks if highest platform is current platform
+                player1.boundary.bottomleft.y = screendim[1] # resets bottom boundary
+                topplaty = screendim[1] # resets highest platform
+            if botplaty == platform.boty(): # checks if lowest platform is current platform
+                player1.boundary.topright.y = 0 # resets top boundary
+                botplaty = 0 # resets lowest platform
 
     if player1.falling:
         player1.move(0, fallspeed)
@@ -367,49 +383,46 @@ while runGame:
 
     for platform in platformsP1[stagenum]:
 
-        if platform.topy() < player1.boty() and platform.boty() > player1.topy():
+        if platform.topy() < player1.boty() and platform.boty() > player1.topy(): # check if player is within vertical range of platform
 
-            if platform.leftx() < rightmostplatx:
-                if player1.rightx() <= platform.leftx():
-                    rightmostplatx = platform.leftx()
-                if rightmostplatx == platform.leftx():
-                    if player1.rightx() <= platform.leftx():
-                        player1.boundary.topright.x = rightmostplatx
-                        # print("reset rightmost", player1.boundary.topright.x)
+            if platform.leftx() < rightmostplatx: # checks if platform is further right than rightmost platform in that Y area
+                if player1.rightx() <= platform.leftx(): # checks if player is actually to the left of platform
+                    rightmostplatx = platform.leftx() # sets rightmost platform to current platform X
+                if rightmostplatx == platform.leftx(): # checks if righmost platform is the current platform
+                    if player1.rightx() <= platform.leftx(): # checks if player is actually left of the platform
+                        player1.boundary.topright.x = rightmostplatx # sets player right boundary
 
-            if platform.rightx() > leftmostplatx:
-                if player1.leftx() >= platform.rightx():
-                    leftmostplatx = platform.rightx()
-                if leftmostplatx == platform.rightx():
-                    if player1.leftx() >= platform.rightx():
-                        player1.boundary.bottomleft.x = leftmostplatx
-                        # print("reset leftmost", player1.boundary.bottomleft.x)
+            if platform.rightx() > leftmostplatx: # checks if platform is further left than leftmost platform in that Y area
+                if player1.leftx() >= platform.rightx(): # checks if player is actually to the right of platform
+                    leftmostplatx = platform.rightx() # sets leftmost platform to current platform X
+                if leftmostplatx == platform.rightx(): # checks if leftmost platform is the current platform
+                    if player1.leftx() >= platform.rightx(): # checks if player is actually right of the platform
+                        player1.boundary.bottomleft.x = leftmostplatx # sets player left boundary
 
-        else:
-            if leftmostplatx == platform.rightx():
-                player1.boundary.bottomleft.x = 0
-                leftmostplatx = 0
-                # print("reset leftmost", player1.boundary.bottomleft.x)
-            if rightmostplatx == platform.leftx():
-                player1.boundary.topright.x = screendim[0]
-                rightmostplatx = screendim[0]
-                # print("reset rightmost", player1.boundary.topright.x)
+        else: # if not in the bounds of specified platform
+            if leftmostplatx == platform.rightx(): # checks if leftmost platform is current platform
+                player1.boundary.bottomleft.x = 0 # resets left boundary
+                leftmostplatx = 0 # resets leftmost platform
+                
+            if rightmostplatx == platform.leftx(): # checks if rightmost platform is current platform
+                player1.boundary.topright.x = screendim[0] # resets right boundary
+                rightmostplatx = screendim[0] # resets rightmost platform
 
-        # print("right", player1.boundary.topright.x)
-        # print("left", player1.boundary.bottomleft.x)
+    # endregion
 
-    if player1.x > prizes[stagenum].leftx() and player1.x < prizes[stagenum].rightx() and player1.y < prizes[stagenum].boty() and player1.y > prizes[stagenum].topy():
-        pygame.mixer.Channel(2).play(pygame.mixer.Sound(dir_path + r'\Sounds\Sound Effects\prizecollect.wav'))
-        pygame.mixer.Channel(2).set_volume(0.3)
-        if stagenum + 1 >= len(prizes):
-            gameStart = False
-            stagenum = -1
-            restart = True
-            # print("end")
-        else:
-            stagenum += 1
-            player1.x = spawnlocations[1]
-            player1.y = spawnlocations[0]
+    #region collectprize
+
+    if player1.x > prizes[stagenum].leftx() and player1.x < prizes[stagenum].rightx() and player1.y < prizes[stagenum].boty() and player1.y > prizes[stagenum].topy(): # if centre of player is in prize bounds
+        pygame.mixer.Channel(2).play(pygame.mixer.Sound(dir_path + r'\Sounds\Sound Effects\prizecollect.wav')) # play collection noise
+        pygame.mixer.Channel(2).set_volume(0.3) # lower volume
+        if stagenum + 1 >= len(prizes): # if the stage number is larger than the number of prizes
+            gameStart = False # end game
+            stagenum = -1 # reset stages
+            restart = True # change title screen
+        else: # if normal collection of prize
+            stagenum += 1 # go to next stage 
+            player1.x = spawnlocation[1] # reset everything else
+            player1.y = spawnlocation[0]
             player1.boundary.topright.x = screendim[0]
             player1.boundary.topright.y = 0
             player1.boundary.bottomleft.x = 0
@@ -418,10 +431,10 @@ while runGame:
             topplaty = screendim[1]
             leftmostplatx = 0
             rightmostplatx = screendim[0]
+    
+    # endregion
 
-
-    # print("left", player1.boundary.bottomleft.x)
-    # print("right", player1.boundary.topright.x)
+    # region draw
 
     if animTimer % 15 == 0:
         animTimer = 0
@@ -429,8 +442,6 @@ while runGame:
             animNum = 0
         animNum += 1
     animTimer += 1
-    # print(animTimer)
-    # print(animNum)
 
     if gameStart:
         for x in range(0, len(platformsP1[stagenum])):
@@ -438,8 +449,10 @@ while runGame:
         prizes[stagenum].imgdraw()
         player1.move(vectorx)
         player1.animate(playerOnGround)
-        # print("waiting")
-    # pygame.draw.circle(windowSurfaceObj, clrGreen, (int(player1.x), int(player1.y)), 5) #draws circle at bottom of player
+
+    # endregion
 
     pygame.display.update()
     fpsClock.tick(60)
+
+# endregion
