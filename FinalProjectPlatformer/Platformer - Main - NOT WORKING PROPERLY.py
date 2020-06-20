@@ -46,14 +46,14 @@ screendim = pygame.display.get_surface().get_size()
 runGame = True
 _JUMPTIME = 20 # Constant value, num pixels player jumps per frame. that determines jump time (higher value means longer jump time)
 _FALLSPEED = 5 # Constant value, num of pixels player falls per frame
-_DEBUG = False
+_DEBUG = True
 # highestplaty = screendim[1]
 # lowestplaty = 0
 # rightmostplatx = screendim[0]
 # leftmostplatx = 0
 vectorx = 0
 vectory = 0
-stagenum = 0
+stagenum = 2
 restart = False
 
 # endregion
@@ -231,7 +231,7 @@ player1 = Player(clrWhite, 100, 50, 25, 600, screendim[0], 0, 0, screendim[1], 1
 
 platformsP1 = [[Platform(clrDrkGrey, 40, 100, 200, 600, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 100, 800, 500, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 100, 500, 575, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 400, 40, screendim[0], 520, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 150, 1205, 320, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, screendim[0], screendim[0]//2, screendim[1], screendim[0], 0, 0, screendim[1])], \
     [Platform(clrDrkGrey, 40, 800, 600, 250, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 100, 100, 450, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 100, 800, 550, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 100, 500, 500, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 500, 40, 1100, 470, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, screendim[0], screendim[0]//2, screendim[1], screendim[0], 0, 0, screendim[1])], \
-        [Platform(clrDrkGrey, 40, 50, 200, 600, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 50, 800, 500, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 50, 500, 575, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 400, 40, screendim[0], 520, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 500, 1100, 320, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 600, 40, 870, 500, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 500, 501, 321, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 400, 690, 180, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, screendim[0], screendim[0]//2, screendim[1], screendim[0], 0, 0, screendim[1])]]\
+        [Platform(clrDrkGrey, 40, 50, 200, 600, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 50, 800, 500, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 50, 500, 575, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 500, 1100, 320, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 600, 40, 870, 500, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 500, 501, 321, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, 400, 690, 180, screendim[0], 0, 0, screendim[1]), Platform(clrDrkGrey, 40, screendim[0], screendim[0]//2, screendim[1], screendim[0], 0, 0, screendim[1])]]\
              # creates array of stages and then a sub-array of platforms in that stage
 
 prizes = [Prize(clrGreen, 120, 60, 1205, 240, screendim[0], 0, 0, screendim[1]), Prize(clrGreen, 120, 60, 1205, 640, screendim[0], 0, 0, screendim[1]), Prize(clrGreen, 120, 60, 1205, 240, screendim[0], 0, 0, screendim[1])] #creates array of prize locations for each stage
@@ -349,57 +349,83 @@ while runGame:
     # region bounds
 
     platnum2 = 0
-    for platform in platformsP1[stagenum]:
+    for x in range(0, len(platformsP1[stagenum])):
         # platnum2 += 1
 
-        if platform.leftx() < player1.rightx() and platform.rightx() > player1.leftx(): # check if player is within horizontal range of platform (the player can stand or hit head on the platform)
-            if platform.topy() < player1.boundary.bottomleft.y: # highestplaty: # checks if platform is higher than highest platform in that X area
-                if player1.boty() <= platform.topy(): # checks if player is actually above platform
-                    player1.boundary.bottomleft.y = platform.topy() #  sets player bottom boundary
+        if platformsP1[stagenum][x].leftx() < player1.rightx() and platformsP1[stagenum][x].rightx() > player1.leftx(): # check if player is within horizontal range of platform (the player can stand or hit head on the platform)
+            if platformsP1[stagenum][x].topy() < player1.boundary.bottomleft.y: # highestplaty: # checks if platform is higher than highest platform in that X area
+                if player1.boty() <= platformsP1[stagenum][x].topy(): # checks if player is actually above platform
+                    player1.boundary.bottomleft.y = platformsP1[stagenum][x].topy() #  sets player bottom boundary
+                    if _DEBUG:
+                        print("New Bottom Boundary", x, "=", player1.boundary.bottomleft.y)
                     # highestplaty = platform.topy() # sets highest platform to current platform Y
             # if highestplaty == platform.topy(): # checks if highest platform is the current platform
             #     if player1.boty() <= platform.topy(): # checks if player is actually above platform
             #         player1.boundary.bottomleft.y = highestplaty # sets player bottom boundary
 
-            if platform.boty() > player1.boundary.topright.y: # lowestplaty: # checks if platform is lower than lowest platform in that X area
-                if player1.topy() >= platform.boty(): # checks if player is actually below platform
-                    player1.boundary.topright.y = lowestplaty # sets player top boundary
+            if platformsP1[stagenum][x].boty() > player1.boundary.topright.y: # lowestplaty: # checks if platform is lower than lowest platform in that X area
+                if player1.topy() >= platformsP1[stagenum][x].boty(): # checks if player is actually below platform
+                    player1.boundary.topright.y = platformsP1[stagenum][x].boty() # sets player top boundary
+                    if _DEBUG:
+                        print("New Top Boundary", x, "=", player1.boundary.topright.y)
                     # lowestplaty = platform.boty() # sets lowest platform to current platform Y
                 # if lowestplaty == platform.boty(): # checks if lowest platform is the current platform
                 #     if player1.topy() >= platform.boty(): # checks if player is actually below platform
                         
 
         else: # if not in the bounds of specified platform
-            if player1.boundary.bottomleft.y == platform.topy(): # checks if highest platform is current platform
+            if player1.boundary.bottomleft.y == platformsP1[stagenum][x].topy(): # checks if highest platform is current platform
                 player1.boundary.bottomleft.y = screendim[1] # resets bottom boundary
+                if _DEBUG:
+                    print("reset bottom boundary")
                 # highestplaty = screendim[1] # resets highest platform
-            if player1.boundary.topright.y == platform.boty(): # checks if lowest platform is current platform
+            if player1.boundary.topright.y == platformsP1[stagenum][x].boty(): # checks if lowest platform is current platform
                 player1.boundary.topright.y = 0 # resets top boundary
+                if _DEBUG:
+                    print("reset top boundary")
                 # lowestplaty = 0 # resets lowest platform
 
     if player1.isfalling:
         player1.move(0, player1.fallspeed)
         player1.fallspeed += 1
 
-    for platform in platformsP1[stagenum]:
+    for x in range(0, len(platformsP1[stagenum])): # update boundaries according to nearest platforms
+        if _DEBUG:
+            print("Examining platform ", x,"...")
 
-        if platform.topy() < player1.boty() and platform.boty() > player1.topy(): # check if player is within vertical range of platform
+        if platformsP1[stagenum][x].topy() < player1.boty() and platformsP1[stagenum][x].boty() > player1.topy(): # check if player is within vertical range of platform (can run into the edge of platform)
+            if _DEBUG:
+                print("Player can run into platform ", x)
 
-            if platform.leftx() < player1.boundary.topright.x: # rightmostplatx: # checks if platform is further right than rightmost platform in that Y area
-                if player1.rightx() <= platform.leftx(): # checks if player is actually to the left of platform
-                    player1.boundary.topright.x = platform.leftx() # sets rightmost platform to current platform X
+            if platformsP1[stagenum][x].leftx() < player1.boundary.topright.x: # rightmostplatx: # checks if platform is further right than rightmost platform in that Y area
+                if _DEBUG:
+                    print("Platform ", x," is further right than previous rightmost platform")
+                if player1.rightx() <= platformsP1[stagenum][x].leftx(): # checks if player is actually to the left of platform
+                    player1.boundary.topright.x = platformsP1[stagenum][x].leftx() # sets rightmost platform to current platform X
+                    if _DEBUG:
+                        print("Player was to left of platform %d, so new R bound: %.1f" %(x,player1.boundary.topright.x))
 
-            if platform.rightx() > player1.boundary.bottomleft.x: # leftmostplatx: # checks if platform is further left than leftmost platform in that Y area
-                if player1.leftx() >= platform.rightx(): # checks if player is actually to the right of platform
-                    player1.boundary.bottomleft.x = platform.rightx() # sets leftmost platform to current platform X
+            if platformsP1[stagenum][x].rightx() > player1.boundary.bottomleft.x: # leftmostplatx: # checks if platform is further left than leftmost platform in that Y area
+                if _DEBUG:
+                    print("Platform ", x," is further left than previous leftmost platform")
+                if player1.leftx() >= platformsP1[stagenum][x].rightx(): # checks if player is actually to the right of platform
+                    player1.boundary.bottomleft.x = platformsP1[stagenum][x].rightx() # sets leftmost platform to current platform X
+                    if _DEBUG:
+                        print("Player was to right of platform %d, so new L bound: %.1f" %(x,player1.boundary.bottomleft.x))
 
         else: # if not in the bounds of specified platform
-            if player1.boundary.bottomleft.x == platform.rightx(): # checks if leftmost platform is current platform
+            if _DEBUG:
+                print("Player cannot run into platform ", x)
+            if player1.boundary.bottomleft.x == platformsP1[stagenum][x].rightx(): # checks if leftmost platform is current platform
                 player1.boundary.bottomleft.x = 0 # resets left boundary
+                if _DEBUG:
+                    print("reset left boundary")
                 # leftmostplatx = 0 # resets leftmost platform
                 
-            if player1.boundary.topright.x == platform.leftx(): # checks if rightmost platform is current platform
+            if player1.boundary.topright.x == platformsP1[stagenum][x].leftx(): # checks if rightmost platform is current platform
                 player1.boundary.topright.x = screendim[0] # resets right boundary
+                if _DEBUG:
+                    print("reset right boundary")
                 # rightmostplatx = screendim[0] # resets rightmost platform
 
     # endregion
